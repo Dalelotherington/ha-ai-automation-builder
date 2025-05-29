@@ -1,0 +1,69 @@
+#!/usr/bin/with-contenv bashio
+
+# Better error handling
+set -e
+
+# Log start with timestamp for debugging
+bashio::log.info "$(date): Starting AI Automation Builder..."
+
+# Get config values with defaults
+PORT=$(bashio::config 'port' '5001')
+DEBUG=$(bashio::config 'debug' 'true')
+HA_URL="http://supervisor/core"
+
+# Use bashio's supervisor API token function - proper format
+if bashio::supervisor.ping; then
+    HA_TOKEN=$(bashio::supervisor.token)
+else
+    bashio::log.warning "Failed to ping supervisor, using fallback token method"
+    if [ -f "/data/options.json" ]; then
+        HA_TOKEN=$(jq --raw-output ".supervisor_token // empty" /data/options.json)
+    else 
+        HA_TOKEN=""
+        bashio::log.warning "No options.json found, running in limited mode without Home Assistant API access"
+    fi
+fi
+
+USE_LLM=$(bashio::config 'use_llm' 'true')
+LLM_MODEL=$(bashio::config 'llm_model' 'tinyllama.gguf')
+
+# Debug environment
+bashio::log.info "Configuration values:"
+bashio::log.info "Port: ${PORT}"
+bashio::log.info "Debug Mode: ${DEBUG}"
+bashio::log.info "Home Assistant URL: ${HA_URL}"
+bashio::log.info "Home Assistant Token available: ${HA_TOKEN:+true}"
+bashio::log.info "LLM Enabled: ${USE_LLM}"
+bashio::log.info "LLM Model: ${LLM_MODEL}"
+
+# Export as environment variables
+export PORT="${PORT}"
+export DEBUG="${DEBUG}"
+export HA_URL="${HA_URL}"
+export HA_TOKEN="${HA_TOKEN}"
+export USE_LLM="${USE_LLM}"
+export LLM_MODEL="${LLM_MODEL}"
+export PYTHONUNBUFFERED=1
+
+# Create directories if they don't exist
+mkdir -p /data/models
+bashio::log.info "Data directories created"
+
+# Start the app with proper error handling
+cd /app || { bashio::log.error "Failed to change to /app directory"; exit 1; }
+bashio::log.info "Starting Python application on port ${PORT}..."
+
+# Check if app.py exists
+if [ ! -f "app.py" ]; then
+    bashio::log.error "app.py not found in current directory!"
+    ls -la
+    exit 1
+fi
+
+# Run with exec to ensure signals are properly handled
+if [[ "$DEBUG" == "true" ]]; then
+    bashio::log.info "Running in debug mode with more verbose output"
+    exec python3 -u app.py --debug
+else
+    exec python3 -u app.py
+fi 

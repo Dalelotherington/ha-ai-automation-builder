@@ -1,0 +1,39 @@
+name: "AI Automation Builder"
+description: "Create Home Assistant automations using natural language with a local LLM"
+version: "1.0.6"
+slug: "ai-automation-builder"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: application
+boot: auto
+webui: "http://[HOST]:[PORT:5001]/"
+ingress: true
+ingress_port: 5001
+ingress_stream: true
+panel_icon: mdi:robot
+panel_title: "AI Automation Builder"
+ports:
+  5001/tcp: 5001
+ports_description:
+  5001/tcp: "Web interface (optional)"
+host_network: false
+apparmor: true
+hassio_api: true
+homeassistant_api: true
+options:
+  port: 5001
+  debug: true
+  use_llm: true
+  llm_model: "tinyllama.gguf"
+schema:
+  port: "int(1025,65535)"
+  debug: "bool"
+  use_llm: "bool"
+  llm_model: "str"
+map:
+  - config:rw
+  - addons:rw
+  - homeassistant:ro

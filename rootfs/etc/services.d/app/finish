@@ -1,0 +1,22 @@
+#!/usr/bin/with-contenv bashio
+
+# Get exit code from service
+EXIT_CODE=${1}
+
+# Log the service termination status
+if [ "${EXIT_CODE}" -ne 0 ] && [ "${EXIT_CODE}" -ne 256 ]; then
+  bashio::log.warning "AI Automation Builder exited unexpectedly. Check the logs for more information."
+else
+  bashio::log.info "AI Automation Builder stopped with exit code ${EXIT_CODE}"
+fi
+
+# Cleanup any temporary files
+if [ -d "/tmp/ai-automation-builder" ]; then
+  rm -rf /tmp/ai-automation-builder
+fi
+
+# Tell s6-overlay to bring down the entire container if service fails
+# Exit code 0 (normal) or SIGTERM (128+15=143) won't trigger container restart
+if [[ "$1" -ne 0 ]] && [[ "$1" -ne 143 ]]; then
+  exit 1
+fi

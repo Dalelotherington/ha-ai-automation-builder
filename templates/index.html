@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Automation Builder</title>
+    <style>
+        :root {
+            --primary-color: #03a9f4;
+            --secondary-color: #2196f3;
+            --background-color: #1c1c1c;
+            --card-background: #2d2d2d;
+            --text-color: #e0e0e0;
+            --border-color: #424242;
+            --button-text: #ffffff;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --domain-color: #ff9800;
+        }
+        
+        body {
+            font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        header .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 22px;
+            color: var(--text-color);
+        }
+        
+        h3 {
+            color: var(--domain-color);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
+            font-size: 16px;
+            margin-bottom: 20px;
+            resize: vertical;
+            box-sizing: border-box;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: var(--button-text);
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        button.secondary {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        button.secondary:hover {
+            background-color: rgba(3, 169, 244, 0.1);
+        }
+        
+        button.small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        pre {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: rgba(76, 175, 80, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-color);
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .entity-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .entity-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entity-info {
+            flex: 1;
+        }
+        
+        .entity-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .entity-id {
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .entity-state {
+            font-size: 14px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .entity-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .search-box {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-color);
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .domain-count {
+            font-size: 14px;
+            color: #aaa;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">AI</div>
+            <h1>AI Automation Builder</h1>
+        </header>
+        
+        <div class="notification success" id="success-notification">
+            Automation saved successfully!
+        </div>
+        
+        <div class="notification error" id="error-notification">
+            Error occurred. Please try again.
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="create">Create Automation</div>
+            <div class="tab" data-tab="entities">Discover Entities</div>
+            <div class="tab" data-tab="test">Test Entities</div>
+        </div>
+        
+        <div class="tab-content active" id="create-tab">
+            <div class="card">
+                <h2>Create Automation</h2>
+                <label for="description">Describe what you want your automation to do:</label>
+                <textarea id="description" placeholder="Example: Turn on the living room lights at sunset and turn them off at 11pm"></textarea>
+                
+                <button id="generate-button">Generate Automation</button>
+            </div>
+            
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Generating automation...</p>
+            </div>
+            
+            <div class="result" id="result-section">
+                <div class="card">
+                    <h2>Generated Automation</h2>
+                    <pre id="yaml-output"># Your automation code will appear here</pre>
+                    
+                    <div class="button-group">
+                        <button id="save-button">Save to Home Assistant</button>
+                        <button id="copy-button" class="secondary">Copy YAML</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="entities-tab">
+            <div class="card">
+                <h2>Discover Entities</h2>
+                <p>Browse and search all entities in your Home Assistant instance.</p>
+                
+                <input type="text" id="entity-search" class="search-box" placeholder="Search entities...">
+                
+                <button id="refresh-entities-button">Refresh Entities</button>
+                
+                <div class="loader" id="entities-loader">
+                    <div class="spinner"></div>
+                    <p>Loading entities...</p>
+                </div>
+                
+                <div id="entities-list" class="entity-list">
+                    <!-- Entities will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="test-tab">
+            <div class="card">
+                <h2>Test Entities</h2>
+                <p>Select an entity and test it by toggling its state or calling a service.</p>
+                
+                <div id="selected-entity">
+                    <p>No entity selected. Go to Discover Entities tab to select an entity to test.</p>
+                </div>
+                
+                <div id="entity-controls" style="display: none;">
+                    <h3>Entity Controls</h3>
+                    <div class="button-group">
+                        <button id="test-toggle-button">Toggle</button>
+                        <button id="test-on-button">Turn On</button>
+                        <button id="test-off-button">Turn Off</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    // Load entities when switching to entities tab
+                    if (tabId === 'entities' && document.getElementById('entities-list').children.length === 0) {
+                        fetchEntities();
+                    }
+                });
+            });
+            
+            // Common elements
+            const successNotification = document.getElementById('success-notification');
+            const errorNotification = document.getElementById('error-notification');
+            
+            // Create Automation tab elements
+            const descriptionField = document.getElementById('description');
+            const generateButton = document.getElementById('generate-button');
+            const saveButton = document.getElementById('save-button');
+            const copyButton = document.getElementById('copy-button');
+            const yamlOutput = document.getElementById('yaml-output');
+            const resultSection = document.getElementById('result-section');
+            const loader = document.getElementById('loader');
+            
+            // Entities tab elements
+            const entitySearchInput = document.getElementById('entity-search');
+            const refreshEntitiesButton = document.getElementById('refresh-entities-button');
+            const entitiesLoader = document.getElementById('entities-loader');
+            const entitiesListContainer = document.getElementById('entities-list');
+            
+            // Test tab elements
+            const selectedEntityContainer = document.getElementById('selected-entity');
+            const entityControls = document.getElementById('entity-controls');
+            const testToggleButton = document.getElementById('test-toggle-button');
+            const testOnButton = document.getElementById('test-on-button');
+            const testOffButton = document.getElementById('test-off-button');
+            
+            let currentAutomation = null;
+            let allEntities = [];
+            let domains = {};
+            let selectedEntity = null;
+            
+            // Hide notifications initially
+            function hideNotifications() {
+                successNotification.style.display = 'none';
+                errorNotification.style.display = 'none';
+            }
+            
+            // Show a notification
+            function showNotification(type, message) {
+                hideNotifications();
+                
+                if (type === 'success') {
+                    successNotification.textContent = message;
+                    successNotification.style.display = 'block';
+                } else {
+                    errorNotification.textContent = message;
+                    errorNotification.style.display = 'block';
+                }
+                
+                // Hide after 5 seconds
+                setTimeout(hideNotifications, 5000);
+            }
+            
+            // Fetch entities from Home Assistant
+            function fetchEntities() {
+                entitiesLoader.style.display = 'block';
+                entitiesListContainer.innerHTML = '';
+                
+                fetch('/api/entities')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        entitiesLoader.style.display = 'none';
+                        
+                        if (data.error) {
+                            showNotification('error', data.error);
+                            return;
+                        }
+                        
+                        allEntities = data.entities;
+                        domains = data.domains;
+                        
+                        displayEntities(domains);
+                    })
+                    .catch(error => {
+                        entitiesLoader.style.display = 'none';
+                        showNotification('error', 'Failed to fetch entities: ' + error.message);
+                    });
+            }
+            
+            // Display entities grouped by domain
+            function displayEntities(domains) {
+                entitiesListContainer.innerHTML = '';
+                
+                const searchTerm = entitySearchInput.value.toLowerCase();
+                
+                // Sort domains alphabetically
+                const sortedDomains = Object.keys(domains).sort();
+                
+                sortedDomains.forEach(domain => {
+                    const domainEntities = domains[domain];
+                    
+                    // Filter entities based on search term
+                    const filteredEntities = domainEntities.filter(entity => {
+                        const entityId = entity.entity_id.toLowerCase();
+                        const entityName = entity.name.toLowerCase();
+                        return entityId.includes(searchTerm) || entityName.includes(searchTerm);
+                    });
+                    
+                    if (filteredEntities.length === 0) {
+                        return; // Skip domains with no matching entities
+                    }
+                    
+                    // Create domain section
+                    const domainSection = document.createElement('div');
+                    const domainTitle = document.createElement('h3');
+                    domainTitle.textContent = domain;
+                    domainTitle.innerHTML += `<span class="domain-count">(${filteredEntities.length})</span>`;
+                    domainSection.appendChild(domainTitle);
+                    
+                    // Sort entities by name
+                    filteredEntities.sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    // Add entities
+                    filteredEntities.forEach(entity => {
+                        const entityItem = document.createElement('div');
+                        entityItem.className = 'entity-item';
+                        
+                        const entityInfo = document.createElement('div');
+                        entityInfo.className = 'entity-info';
+                        
+                        const entityName = document.createElement('div');
+                        entityName.className = 'entity-name';
+                        entityName.textContent = entity.name;
+                        
+                        const entityId = document.createElement('div');
+                        entityId.className = 'entity-id';
+                        entityId.textContent = entity.entity_id;
+                        
+                        entityInfo.appendChild(entityName);
+                        entityInfo.appendChild(entityId);
+                        
+                        const entityState = document.createElement('span');
+                        entityState.className = 'entity-state';
+                        entityState.textContent = entity.state;
+                        
+                        const entityActions = document.createElement('div');
+                        entityActions.className = 'entity-actions';
+                        
+                        const testButton = document.createElement('button');
+                        testButton.className = 'small';
+                        testButton.textContent = 'Test';
+                        testButton.addEventListener('click', () => {
+                            selectEntityForTesting(entity);
+                            
+                            // Switch to test tab
+                            document.querySelector('.tab[data-tab="test"]').click();
+                        });
+                        
+                        entityActions.appendChild(testButton);
+                        
+                        entityItem.appendChild(entityInfo);
+                        entityItem.appendChild(entityState);
+                        entityItem.appendChild(entityActions);
+                        
+                        domainSection.appendChild(entityItem);
+                    });
+                    
+                    entitiesListContainer.appendChild(domainSection);
+                });
+                
+                if (entitiesListContainer.children.length === 0) {
+                    entitiesListContainer.innerHTML = '<p>No entities found matching your search.</p>';
+                }
+            }
+            
+            // Select entity for testing
+            function selectEntityForTesting(entity) {
+                selectedEntity = entity;
+                
+                // Update selected entity display
+                selectedEntityContainer.innerHTML = `
+                    <h3>${entity.name}</h3>
+                    <p><strong>Entity ID:</strong> ${entity.entity_id}</p>
+                    <p><strong>Current State:</strong> ${entity.state}</p>
+                `;
+                
+                // Show entity controls
+                entityControls.style.display = 'block';
+                
+                // Enable/disable buttons based on domain
+                const domain = entity.entity_id.split('.')[0];
+                const canToggle = ['light', 'switch', 'input_boolean', 'automation', 'script'].includes(domain);
+                
+                testToggleButton.disabled = !canToggle;
+                testOnButton.disabled = !canToggle;
+                testOffButton.disabled = !canToggle;
+            }
+            
+            // Test entity with action
+            function testEntity(entityId, action) {
+                fetch('/api/entity/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        entity_id: entityId,
+                        action: action
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        
+                        // Refresh entities after a short delay
+                        setTimeout(fetchEntities, 1500);
+                    } else {
+                        showNotification('error', data.error || 'Failed to test entity');
+                    }
+                })
+                .catch(error => {
+                    showNotification('error', 'Error testing entity: ' + error.message);
+                });
+            }
+            
+            // Generate automation
+            generateButton.addEventListener('click', function() {
+                const description = descriptionField.value.trim();
+                
+                if (!description) {
+                    showNotification('error', 'Please enter a description first.');
+                    return;
+                }
+                
+                // Show loader
+                loader.style.display = 'block';
+                resultSection.style.display = 'none';
+                
+                // Call API to generate automation
+                fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ description })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Store the automation
+                    currentAutomation = data.automation;
+                    
+                    // Show the result
+                    yamlOutput.textContent = data.yaml;
+                    resultSection.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loader.style.display = 'none';
+                    showNotification('error', 'Failed to generate automation: ' + error.message);
+                });
+            });
+            
+            // Save automation to Home Assistant
+            saveButton.addEventListener('click', function() {
+                if (!currentAutomation) {
+                    showNotification('error', 'No automation to save. Generate one first.');
+                    return;
+                }
+                
+                // Show loader
+                loader.style.display = 'block';
+                
+                // Call API to save automation
+                fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ automation: currentAutomation })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    if (data.success) {
+                        showNotification('success', data.message || 'Automation saved successfully!');
+                    } else {
+                        showNotification('error', data.message || 'Failed to save automation.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loader.style.display = 'none';
+                    showNotification('error', 'Failed to save automation: ' + error.message);
+                });
+            });
+            
+            // Copy YAML to clipboard
+            copyButton.addEventListener('click', function() {
+                const yamlText = yamlOutput.textContent;
+                
+                if (!yamlText || yamlText === '# Your automation code will appear here') {
+                    showNotification('error', 'No automation to copy.');
+                    return;
+                }
+                
+                navigator.clipboard.writeText(yamlText)
+                    .then(() => {
+                        showNotification('success', 'YAML copied to clipboard!');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy:', err);
+                        showNotification('error', 'Failed to copy to clipboard.');
+                    });
+            });
+            
+            // Search entities
+            entitySearchInput.addEventListener('input', function() {
+                displayEntities(domains);
+            });
+            
+            // Refresh entities
+            refreshEntitiesButton.addEventListener('click', fetchEntities);
+            
+            // Test entity buttons
+            testToggleButton.addEventListener('click', function() {
+                if (!selectedEntity) return;
+                testEntity(selectedEntity.entity_id, 'toggle');
+            });
+            
+            testOnButton.addEventListener('click', function() {
+                if (!selectedEntity) return;
+                testEntity(selectedEntity.entity_id, 'turn_on');
+            });
+            
+            testOffButton.addEventListener('click', function() {
+                if (!selectedEntity) return;
+                testEntity(selectedEntity.entity_id, 'turn_off');
+            });
+            
+            // Initialize
+            hideNotifications();
+        });
+    </script>
+</body>
+</html>
